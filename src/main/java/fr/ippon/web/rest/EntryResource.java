@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import fr.ippon.domain.Entry;
 
 import fr.ippon.repository.EntryRepository;
+import fr.ippon.security.SecurityUtils;
 import fr.ippon.web.rest.util.HeaderUtil;
 import fr.ippon.web.rest.util.PaginationUtil;
 import io.swagger.annotations.ApiParam;
@@ -93,7 +94,8 @@ public class EntryResource {
     @Timed
     public ResponseEntity<List<Entry>> getAllEntries(@ApiParam Pageable pageable) {
         log.debug("REST request to get a page of Entries");
-        Page<Entry> page = entryRepository.findAll(pageable);
+        // Page<Entry> page = entryRepository.findAll(pageable);
+        Page<Entry> page = entryRepository.findByBlogUserLoginOrderByDateDesc(SecurityUtils.getCurrentUserLogin(), pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/entries");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
